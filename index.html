@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+ <html lang="en">
+ <head> 
+ <meta charset="UTF-8" /> 
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Speedy Typing</title> 
+ <link rel="stylesheet" href="style.css" />
+</head> 
+ <body> 
+    <!-- Navigation --> 
+    <header class="navbar">
+    <div class="logo">Speedy <span>Typing</span></div> 
+     <nav> <a href="#home">Home</a>
+  <a href="#features">Features</a> 
+  <a href="#about">About</a> 
+    </nav>
+     </header>
+  <!-- Hero Section --> 
+   <section id="home" class="hero">
+    <div class="hero-content">
+     <h1>Grow Your Typing speed with <span>Speedy Typing</span></h1>
+    <p>We provide the best digital typing to elevate your skills.</p> 
+    <a href="#test" class="btn">Get Started</a> 
+     </div> 
+     </section> 
+    <!-- Features Section -->
+ <section id="features" class="features">
+ <h2>Our Features</h2> 
+ <div class="feature-container">
+<div class="feature">
+<h3>1. Typing Test Features</h3>
+<p>Multiple test durations: 15s, 30s, 60s, 120s.<br>
+Custom text passages: Random sentences or user-defined text.<br>
+  Word-by-word highlighting.</p>
+ </div>
+ <div class="feature">
+<h3>2. Performance Metrics</h3>
+ <p>WPM (Words per Minute), Accuracy, Errors Count, Time Left.</p> 
+</div> 
+ <div class="feature">
+<h3>3. User Experience</h3> 
+<p>Start/Reset buttons, Responsive design for all devices.</p>
+</div> 
+</div>
+</section>
+<!-- About Section --> 
+<section id="about" class="about">
+<div class="about-content"> 
+<h2>About Us</h2>
+<p> We are a passionate team dedicated to building powerful typing solutions that help grow your typing speed and accuracy. Our goal is to combine creativity and technology to deliver impactful results. </p>
+</div>
+</section>
+ <!-- Typing Test Section --> 
+ <section id="test" class="wrap"> 
+ <header> 
+    <h1>Typing Speed Test</h1> 
+    <div class="controls"> 
+    <label class="small" for="duration">Duration:</label>
+    <select id="duration">
+    <option value="15">15s</option>
+    <option value="30" selected>30s</option>
+    <option value="60">60s</option> 
+    <option value="120">120s</option>
+    </select> <button id="startBtn">Start Test</button> 
+    <button id="resetBtn" class="btn-ghost">Reset</button>
+ </div>
+    </header>
+        <div class="card">
+        <div id="quote" class="textbox" aria-live="polite">
+        </div> 
+        <textarea id="input" placeholder="Start typing here..." disabled>
+        </textarea> <div class="stats">
+    <div class="stat"> 
+<div class="small">WPM</div> 
+<div id="wpm" class="value">0</div> 
+</div> 
+<div class="stat">
+<div class="small">Accuracy</div>
+<div id="accuracy" class="value">100%</div>
+</div> 
+    <div class="stat">
+    <div class="small">Time Left</div> 
+    <div id="time" class="value">0s</div>
+    </div>
+    <div class="stat">
+    <div class="small">Errors</div> 
+    <div id="errors" class="value">0</div> 
+    </div> </div> <div class="test-footer"> 
+ <div class="small">Tip: Press Start then focus the input. Backspace allowed.</div> 
+    <div> 
+ <button id="saveBtn" class="btn-ghost">Save Result</button>
+    </div>
+    </div>
+    <div class="history" id="history">
+    <strong>History</strong>
+    <div id="historyList">
+    </div>
+    </div>
+    </div>
+    </section>
+  <!-- Footer -->
+    <footer class="footer">
+<p>© 2025 Speedy Typing. All rights reserved.</p> 
+    </footer>
+     <!-- JavaScript --> 
+      <script>
+       document.addEventListener("DOMContentLoaded", () => {
+         const PASSAGES = [ 
+            "1 2 3 4 5 6 7 8 9 0 56 9 87 65 43 23 12 90 87 65 43 21",
+            "12 34 56 78 90 21 43 65 87 09 87 65 43 21 09 87 65 43",
+            "1234567890 qwertyuiop asdfghjkl zxcvbnm",
+            "45 67 89 23 12 90 87 65 43 21 34 56 78 90",
+            "9 8 7 6 5 4 3 2 1 0 12 23 34 45 56 67 78",
+            "90 87 65 43 21 09 87 65 43 21 12 34 56",
+            "8 3 6 9 2 90 46 5 9 2 8 67 87 65 56 45 45 777 345 23 12",
+            "The quick brown fox jumps over the lazy dog.",
+            "Pack my box with five dozen liquor jugs.",
+            "How vexingly quick daft zebras jump!",
+            "Bright vixens jump; dozy fowl quack.",
+            "Sphinx of black quartz, judge my vow.",
+            "The five boxing wizards jump quickly.",
+            "Jackdaws love my big sphinx of quartz.",
+            "Typing is a skill that improves with practice.",
+            "Typing speed tests are a great way to improve your keyboard skills.",
+            "Effective typing requires practice and proper finger placement.",
+            "Consistent practice can significantly enhance your typing speed and accuracy.",
+            "Mastering touch typing can lead to increased productivity in daily tasks.",
+            "Good posture and ergonomics are important for long typing sessions.",
+            "The quick brown fox jumps over the lazy dog.",
+            "Typing is a useful skill that becomes faster with practice.",
+            "Practice makes progress: keep typing every day to improve speed and accuracy.",
+            "JavaScript lets you change HTML content, styles, and respond to user events.",
+            "Web development combines HTML, CSS, and JavaScript to build interactive experiences." ];
+
+
+  const quoteEl = document.getElementById('quote');
+  const inputEl = document.getElementById('input');
+  const startBtn = document.getElementById('startBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const durationEl = document.getElementById('duration');
+  const wpmEl = document.getElementById('wpm');
+  const accEl = document.getElementById('accuracy');
+  const timeEl = document.getElementById('time');
+  const errorsEl = document.getElementById('errors');
+  const saveBtn = document.getElementById('saveBtn');
+  const historyList = document.getElementById('historyList');
+
+  let timer = null, totalTime = 30, started = false, startTime = null, currentText = '', errors = 0;
+
+  // Pick a random sentence
+  function pickPassage() {
+    return PASSAGES[Math.floor(Math.random() * PASSAGES.length)];
+  }
+
+  // Render passage into spans per character
+  function renderPassage(text) {
+    quoteEl.innerHTML = '';
+    for (let char of text) {
+      const span = document.createElement('span');
+      span.textContent = char;
+      quoteEl.appendChild(span);
+    }
+  }
+
+  function resetState() {
+    clearInterval(timer);
+    timer = null;
+    started = false;
+    errors = 0;
+    wpmEl.textContent = '0';
+    accEl.textContent = '100%';
+    errorsEl.textContent = '0';
+    timeEl.textContent = '0s';
+    inputEl.value = '';
+    inputEl.disabled = true;
+    currentText = pickPassage();
+    renderPassage(currentText);
+    updateHistoryUI();
+  }
+
+  function calculate() {
+    const input = inputEl.value;
+    const target = currentText;
+    const spans = quoteEl.querySelectorAll('span');
+    let correct = 0;
+
+    for (let i = 0; i < spans.length; i++) {
+      const char = input[i];
+      const span = spans[i];
+
+      if (char == null) {
+        span.className = '';
+      } else if (char === target[i]) {
+        span.className = 'correct';
+        correct++;
+      } else {
+        span.className = 'incorrect';
+      }
+    }
+
+    errors = input.length - correct;
+    const accuracy = input.length === 0 ? 100 : Math.round((correct / input.length) * 100);
+    accEl.textContent = accuracy + '%';
+
+    const elapsed = (Date.now() - startTime) / 60000;
+    const wpm = elapsed > 0 ? Math.round((correct / 5) / elapsed) : 0;
+    wpmEl.textContent = wpm;
+    errorsEl.textContent = errors;
+  }
+
+  function startTest() {
+    if (started) return;
+    totalTime = parseInt(durationEl.value);
+    inputEl.disabled = false;
+    inputEl.focus();
+    started = true;
+    startTime = Date.now();
+    let timeLeft = totalTime;
+    timeEl.textContent = timeLeft + 's';
+
+    timer = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      timeLeft = Math.max(0, totalTime - elapsed);
+      timeEl.textContent = timeLeft + 's';
+      calculate();
+      if (timeLeft <= 0) finishTest();
+    }, 250);
+  }
+
+  function finishTest() {
+    clearInterval(timer);
+    timer = null;
+    started = false;
+    inputEl.disabled = true;
+    calculate();
+  }
+
+  function saveResult() {
+    const wpm = wpmEl.textContent;
+    const accuracy = accEl.textContent.replace('%', '');
+    const duration = durationEl.value;
+    const stored = JSON.parse(localStorage.getItem('typing_history') || '[]');
+    stored.push({ date: new Date().toLocaleString(), wpm, accuracy, duration });
+    while (stored.length > 20) stored.shift();
+    localStorage.setItem('typing_history', JSON.stringify(stored));
+    updateHistoryUI();
+    alert('Result saved!');
+  }
+
+  function updateHistoryUI() {
+    const stored = JSON.parse(localStorage.getItem('typing_history') || '[]');
+    historyList.innerHTML = stored.length
+      ? stored.slice().reverse().map(item =>
+          `<div class="small">${item.date} — WPM: ${item.wpm}, Accuracy: ${item.accuracy}%</div>`
+        ).join('')
+      : '<div class="small">No saved results yet.</div>';
+  }
+
+  startBtn.addEventListener('click', startTest);
+  resetBtn.addEventListener('click', () => {
+    if (confirm('Reset test?')) resetState();
+  });
+  inputEl.addEventListener('input', calculate);
+  saveBtn.addEventListener('click', saveResult);
+
+  resetState();
+});
+
+</script>
+ </body>
+ </html>
